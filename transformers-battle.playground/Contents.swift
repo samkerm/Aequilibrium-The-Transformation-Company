@@ -3,8 +3,8 @@
 import UIKit
 
 var inputFighter = ["Jzhupa, D, 8,9,2,6,9,5,6,10",
-                    "Soundwave, D, 8,8,8,8,4,8,8,10",
-                    "Bluestreak, A, 7,6,7,9,5,2,9,7",
+                    "Soundwave, D, 7,9,7,9,5,2,9,7",
+                    "Bluestreak, A, 7,7,7,9,5,2,9,7",
                     "Hubcap, A, 4,4,4,4,4, 4,4,4", // Im going to assume "Hubcap: A, 4,4,4,4,4,4,4,4" has a ":" typo
                     "Optimus Prime, A, 6,6,7,9,10,2,9,7"]
 
@@ -152,6 +152,31 @@ func isMajorDestroction(t1:Transformer, t2:Transformer) -> Bool {
 }
 
 
+
+// Knowing the number of battles we can simply ignore the names of the ones that batteled and return the names of the remaining Transformers
+
+func surviorNames(autobots: [Transformer], decepticons: [Transformer], numberOfBattles: Int) -> String {
+    
+    var unbattled = ""
+    
+    if autobots.count > numberOfBattles {
+        let unbattledTransformer = autobots.count - numberOfBattles
+        
+        for i in 0..<unbattledTransformer {
+            unbattled = autobots.reversed()[i].name + " "
+        }
+    } else if decepticons.count > numberOfBattles {
+        let unbattledTransformer = decepticons.count - numberOfBattles
+        
+        for i in 0..<unbattledTransformer {
+            unbattled = decepticons.reversed()[i].name + " "
+        }
+    }
+    
+    return unbattled
+}
+
+
 // Main battle where all the outcomes are assssed and printed to the console
 
 func war() {
@@ -161,14 +186,13 @@ func war() {
         var autobotWins = [Transformer]()
         var decepticonWins = [Transformer]()
         var winners = ""
-        var unbattled = ""
         
         for i in 0..<numberOfBattles {
             if isMajorDestroction(t1: autobots[i], t2: decepticons[i]) {
                 print("Everyone is dead!!") // War ends
                 return
             }
-            var outcome = battle(t1: autobots[i], t2: decepticons[i])
+            let outcome = battle(t1: autobots[i], t2: decepticons[i])
             if let outcome = outcome { // We dont care about a tie
                 if outcome.group == "A" {
                     autobotWins.append(outcome)
@@ -178,24 +202,12 @@ func war() {
             }
         }
         
+        
         print("Number of battles: \(numberOfBattles)\nAutobots won: \(autobotWins.count)\nDecepticons won: \(decepticonWins.count)")
         
-        
-        if autobots.count > numberOfBattles {
-            var unbattledTransformer = autobots.count - numberOfBattles
-            
-            for i in 0..<unbattledTransformer {
-                unbattled = autobots.reversed()[i].name + " "
-            }
-        } else if decepticons.count > numberOfBattles {
-            var unbattledTransformer = decepticons.count - numberOfBattles
-            
-            for i in 0..<unbattledTransformer {
-                unbattled = decepticons.reversed()[i].name + " "
-            }
-        } else {
-            unbattled = "No survivor"
-        }
+        let survivorNames = surviorNames(autobots: autobots,
+                                         decepticons: decepticons,
+                                         numberOfBattles: numberOfBattles)
         
         if autobotWins.count > decepticonWins.count {
             for winner in autobotWins {
@@ -203,7 +215,9 @@ func war() {
             }
             
             print("Winning team (Autobots): \(winners)")
-            print("Survivors from the losing team (Decepticons): \(unbattled)")
+            if autobots.count < decepticons.count {
+                print("Survivors from the losing team (Decepticons): \(survivorNames)")
+            }
             
         } else if autobotWins.count < decepticonWins.count {
             
@@ -212,7 +226,10 @@ func war() {
             }
             
             print("Winning team (Decepticons): \(winners)")
-            print("Survivors from the losing team (Autobots): \(unbattled)")
+            if decepticons.count < autobots.count {
+                print("Survivors from the losing team (Autobots): \(survivorNames)")
+            }
+            
         } else {
             print("Its a draw")
         }
